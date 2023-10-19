@@ -4,13 +4,42 @@ import bay from "../../public/images/bay.png";
 import { nftCardprops } from "@/utils/types";
 import { useContext, useState } from "react";
 import { MarketContext } from "@/context/MarketStore";
+import { utils } from "near-api-js";
 
 function NftCard({ nft }: nftCardprops) {
   const [isHover, setIsHover] = useState(false);
   const { wallet, handleRouting } = useContext(MarketContext);
 
   const handleBuying = () => {};
-  const handleListing = () => {};
+  const handleListing = async () => {
+    try {
+      // const storageDeposit = await wallet?.callMethod({
+      //   contractId: "pixil.phlay.testnet",
+      //   method: "storage_deposit",
+      //   args: {
+      //     account_id: wallet?.accountId,
+      //   },
+      //   deposit: utils.format.parseNearAmount("1"),
+      // });
+      // console.log(storageDeposit);
+      const newListing = await wallet?.callMethod({
+        contractId: "pixil.phlay.testnet",
+        method: "nft_approve",
+        args: {
+          owner_id: "pixil.phlay.testnet",
+          token_id: nft.token_id,
+          msg: JSON.stringify({
+            sale_conditions: utils.format.parseNearAmount("77"),
+          }),
+        },
+        deposit: utils.format.parseNearAmount("1"),
+      });
+      console.log(newListing);
+      console.log("listing added");
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <Box
       borderRadius={[
@@ -94,6 +123,10 @@ function NftCard({ nft }: nftCardprops) {
               display={isHover ? ["none", "none", "block"] : "none"}
               transition={"all 0.5s ease-in-out"}
               onClick={handleListing}
+              position={"absolute"}
+              left={0}
+              top={0}
+              zIndex={30}
             >
               <Text
                 fontSize={["0.59869rem", "0.59869rem", "1.17169rem"]}
